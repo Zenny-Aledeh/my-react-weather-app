@@ -1,0 +1,10 @@
+body {
+  margin: auto;
+  max-width: 1000px;
+  background: white;
+  padding-top: 120px;
+}
+
+footer {
+  text-align: center;
+}
