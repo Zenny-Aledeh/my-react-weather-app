@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import FormattedDate from "./FormattedDate";
+
 import axios from "axios";
 import "./Weather.css";
 
 export default function Weather(props) {
   const [weatherData, setWeatherData] = useState({ ready: false });
-
+  const [city, setCity] = useState(props.defaultCity);
   function handleResponse(response) {
     console.log(response.data);
     setWeatherData({
@@ -13,14 +14,29 @@ export default function Weather(props) {
       temperature: response.data.main.temp,
       wind: response.data.wind.speed,
       description: response.data.weather[0].description,
-      iconUrl: "https://cdn-icons-png.flaticon.com/512/1779/1779940.png",
+      iconUrl: `https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`,
       date: new Date(response.data.dt * 1000),
       humidity: response.data.main.humidity,
       rain: response.data.main.rain,
       city: response.data.name,
-      sunrise: response.data.sys.sunrise,
-      sunset: response.data.sys.sunset,
+      temp_max: response.data.main.temp_max,
+      temp_min: response.data.main.temp_min,
     });
+  }
+
+  function search() {
+    const apiKey = "1266ad07b66517497b1acf79ea5a6a64";
+    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+    axios.get(apiUrl).then(handleResponse);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    search();
+  }
+
+  function handleCityChange(event) {
+    setCity(event.target.value);
   }
 
   if (weatherData.ready) {
@@ -28,12 +44,13 @@ export default function Weather(props) {
       <div className="Weather grid-container">
         <div className="main-container">
           <div className="grid-item main">
-            <form>
+            <form onSubmit={handleSubmit}>
               <input
                 type="search"
                 placeholder="Enter a city..."
                 autoFocus="on"
                 className="form-search"
+                onChange={handleCityChange}
               />
               <input type="submit" value="🔍" className="search-btn" />
             </form>
@@ -100,13 +117,12 @@ export default function Weather(props) {
               <p>{weatherData.wind}mph</p>
             </div>
             <div className="flex-item flex-item13">
-              <p>Chance of Rain</p>
-              <p>{weatherData.rain}%</p>
+              <p>Lowest Temp</p>
+              <p>{Math.round(weatherData.temp_min)}</p>
             </div>
             <div className="flex-item flex-item14">
-              <p>Sunrise & Sunset</p>
-              <p>{weatherData.sunrise}</p>
-              <p>{weatherData.sunset}</p>
+              <p>Highest Temp</p>
+              <p>{Math.round(weatherData.temp_max)}</p>
             </div>
             <div className="flex-item flex-item15">
               <p>Humidity</p>
@@ -117,10 +133,7 @@ export default function Weather(props) {
       </div>
     );
   } else {
-    const apiKey = "1266ad07b66517497b1acf79ea5a6a64";
-    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${props.defaultCity}&appid=${apiKey}&units=metric`;
-    axios.get(apiUrl).then(handleResponse);
-
+    search();
     return "Loading...";
   }
 }
