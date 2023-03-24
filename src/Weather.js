@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import FormattedDate from "./FormattedDate";
-
+import WeatherIcon from "./WeatherIcon";
+import WeatherTemperature from "./WeatherTemperature";
 import axios from "axios";
 import "./Weather.css";
 
@@ -14,7 +15,7 @@ export default function Weather(props) {
       temperature: response.data.main.temp,
       wind: response.data.wind.speed,
       description: response.data.weather[0].description,
-      iconUrl: `https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`,
+      icon: response.data.weather[0].icon,
       date: new Date(response.data.dt * 1000),
       humidity: response.data.main.humidity,
       rain: response.data.main.rain,
@@ -54,16 +55,17 @@ export default function Weather(props) {
               />
               <input type="submit" value="🔍" className="search-btn" />
             </form>
+            <div>
+              <WeatherIcon code={props.data.icon} />
+            </div>
             <img
               src={weatherData.iconUrl}
               alt={weatherData.description}
               className="main-img"
             />
             <div>
-              <p className="temp">
-                <span>{Math.round(weatherData.temperature)}</span>
-                <span>℃</span>
-              </p>
+              <WeatherTemperature celsius={props.data.temperaature} />
+
               <p className="day">
                 <FormattedDate date={weatherData.date} />
               </p>
